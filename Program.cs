@@ -116,7 +116,6 @@ if (app.Environment.IsDevelopment())
 
 // ── Middleware ───────────────────────────────────────────────
 app.UseCors("DefaultCorsPolicy");
-app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
