@@ -5,6 +5,7 @@ using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,27 +63,37 @@ builder.Services.AddCors(options =>
 
 // ── Firebase JWT Authentication ───────────────────────────────
 builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
     {
-        options.Authority = "https://securetoken.google.com/cryptostellernew01";
-        options.MetadataAddress = "https://securetoken.google.com/cryptostellernew01/.well-known/openid-configuration";  // ← ADD
-        options.RequireHttpsMetadata = false;  
-        options.RefreshOnIssuerKeyNotFound = true; 
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidIssuer = "https://securetoken.google.com/cryptostellernew01",
-
             ValidateAudience = true,
             ValidAudience = "cryptostellernew01",
-
             ValidateLifetime = true,
-            ValidateIssuerSigningKey = true
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
+            {
+                var client = new HttpClient();
+                var json = client.GetStringAsync(
+                    "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com"
+                ).Result;
+
+                var keys = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+                return keys!.Select(k =>
+                {
+                    var cert = new System.Security.Cryptography.X509Certificates.X509Certificate2(
+                        System.Text.Encoding.UTF8.GetBytes(k.Value));
+                    return new Microsoft.IdentityModel.Tokens.X509SecurityKey(cert)
+                    {
+                        KeyId = k.Key
+                    };
+                });
+            }
         };
 
         options.MapInboundClaims = false;
-
         options.Events = new JwtBearerEvents
         {
             OnAuthenticationFailed = context =>
