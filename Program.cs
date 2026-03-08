@@ -66,7 +66,9 @@ builder.Services
     .AddJwtBearer(options =>
     {
         options.Authority = "https://securetoken.google.com/cryptostellernew01";
-
+        options.MetadataAddress = "https://securetoken.google.com/cryptostellernew01/.well-known/openid-configuration";  // ← ADD
+        options.RequireHttpsMetadata = false;  
+        options.RefreshOnIssuerKeyNotFound = true; 
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
