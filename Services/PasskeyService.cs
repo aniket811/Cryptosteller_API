@@ -11,7 +11,7 @@ using static CryptostellerAPI.Models.PasskeyDTOs;
 
 namespace CryptostellerAPI.Services
 {
-    public class PasskeyService
+    public class PasskeyService: IPasskeyService
     {
         private readonly IPasskeyRepository _repo;
         private readonly IDistributedCache _cache;
@@ -340,7 +340,7 @@ namespace CryptostellerAPI.Services
                         UserVerification = UserVerificationRequirement.Required,
                     },
                     StoredPublicKey = Base64UrlDecode(credential.PublicKey),  // ← was PublicKey
-                    StoredSignatureCounter = (uint)credential.SignCount,             // ← cast long to uint
+                    StoredSignatureCounter = (uint)credential.SignCount,        // ← cast long to uint 
                     IsUserHandleOwnerOfCredentialIdCallback = (args, _) => Task.FromResult(true)
                 };
 

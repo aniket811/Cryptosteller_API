@@ -32,7 +32,7 @@ namespace CryptostellerAPI.Controllers
         }
         // ──────────────────────────────────────────────────────────
         //  REGISTRATION — Step 3
-        //  Angular sends the credential the device created.
+        //  Client sends the credential the device created.
         //  We verify it and save to SQL Server.
         // ──────────────────────────────────────────────────────────
         [HttpPost("register/verify")]

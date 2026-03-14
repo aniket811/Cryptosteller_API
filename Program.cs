@@ -32,7 +32,7 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddScoped<CryptostellerAPI.Repository.IPasskeyRepository,
                            CryptostellerAPI.Repository.PasskeyRepository>();
 
-builder.Services.AddScoped<PasskeyService>();
+builder.Services.AddScoped<IPasskeyService,PasskeyService>();
 
 // ── FIDO2 Configuration ───────────────────────────────────────
 var fido2Config = new Fido2NetLib.Fido2Configuration
